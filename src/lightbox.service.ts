@@ -1,3 +1,4 @@
+import { Observable, Subject } from 'rxjs';
 import {
   ApplicationRef,
   ComponentFactoryResolver,
@@ -7,21 +8,28 @@ import {
 } from '@angular/core';
 import { LightboxComponent } from './lightbox.component';
 import { LightboxConfig } from './lightbox-config.service';
-import { LightboxEvent, LIGHTBOX_EVENT, IAlbum } from './lightbox-event.service';
+import { LightboxEvent, LIGHTBOX_EVENT, IAlbum, IEvent } from './lightbox-event.service';
 import { LightboxOverlayComponent } from './lightbox-overlay.component';
 
 @Injectable()
 export class Lightbox {
   private _documentRef: Document;
+  private _event: any;
+  private _deleteSrcSource: Subject<Object>;
+  public deleteSrc$: Observable<Object>;
+
   constructor(
     private _componentFactoryResolver: ComponentFactoryResolver,
     private _injector: Injector,
     private _applicationRef: ApplicationRef,
     private _lightboxConfig: LightboxConfig,
     private _lightboxEvent: LightboxEvent
-
   ) {
     this._documentRef = window.document;
+    this._deleteSrcSource = new Subject<Object>();
+    this.deleteSrc$ = this._deleteSrcSource.asObservable();
+    this._event.subscription = this._lightboxEvent.lightboxEvent$
+      .subscribe((event: IEvent) => this._onReceivedEvent(event));
   }
 
   open(album: Array<IAlbum>, curIndex = 0, options = {}): void {
@@ -72,5 +80,15 @@ export class Lightbox {
     const component = factory.create(this._injector);
 
     return component;
+  }
+
+  private _onReceivedEvent(event: IEvent): void {
+    switch (event.id) {
+      case LIGHTBOX_EVENT.DELETE:
+        this._deleteSrcSource.next(event.data);
+        break;
+      default:
+        break;
+    }
   }
 }

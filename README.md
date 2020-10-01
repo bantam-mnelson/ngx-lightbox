@@ -14,7 +14,7 @@ A [lightbox2](https://github.com/lokesh/lightbox2) implementation port to use wi
 
 ## Installation
 
-`npm install --save ngx-lightbox`
+`nnpm install --save https://github.com/bantam-mnelson/ngx-lightbox/archive/2.2.5.tar.gz`
 
 Update your `angular.json`
 
